@@ -1,19 +1,23 @@
 __author__ = 'mark'
 
 #Important.
-from phones import*
+from SoundChangeApplier.phones import*
 
-debug = 1
+debug = 0
 
 if debug:
-    f = Features('ptkbdgaiumnN') #Will be different by language
-    f['syllabic'] = 'aeiou'
-    f['consonant'] = 'ptkbdgmnN'
+    f = Features('ptkfsxaeioumnN') #Will be different by language. Contains all letters.
+    f['syllabic'] = ['ptkfsxmnN','aeiou'] #All based on 0=false, 1=true.
+    f['consonant'] = 'ptk'
     f['voiced'] = 'bdgmnN'
     f['labial'] = 'pbm'
     f['coronal'] = 'tdn'
     f['dorsal'] = 'aeioukgN'
     f['nasal'] = 'mnN'
+
+    all = f['syllabic']
+
+    print(f.get_letters() == all)
 
     #vowels
     f['front'] = 'i'

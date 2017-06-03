@@ -5,22 +5,26 @@ import re
 debug = 0
 
 class Features(dict):
-    #Has a dictionary
+    #Has a dictionary. Dictionary holds sets.
     def __init__(self, letters):
-        self.letters = letters
+        self.letters = set(letters)
         self.__valid_places = None
 
     def get_letters(self):
-        return self.letters
+        return self.letters.copy()
 
     def set_letters(self, l):
-        self.letters = l
+        self.letters = {l}
 
     def get_valid_places(self):
         return self.__valid_places
 
     def set_valid_places(self, places: list):
         self.__valid_places = places
+        
+    def add(self,feature,lets):
+        #add two sets at once. One that does contain, one that doesn't.
+        self[feature] = [self.letters.difference(lets), set(lets)]
 
 
 #Words exist as a series of phonemes. Phonemes have a set of phonological features.
@@ -31,28 +35,41 @@ class Phone(dict):
 
     def featurize(self, letter):
         for i in self._features.keys():
-            self[i] = letter in self._features[i] #Boolean t/f
+            self[i] = letter in self._features[i][1] #Boolean t/f
             if i in self._features.get_valid_places() and self[i]:
                 self._place = i
 
 
     def letterize(self):
         letter = self._features.get_letters() #start as a list of all possible letters
+        #Rewritten for sets instead of strings.
+
         for i in self._features.keys():
-            before = letter
-            if(self[i]):
-                add = '+'
-                pattern = '[^' + self._features[i] + ']'
+            if self[i]:
+                letter = letter.difference(self._features[i][0])
             else:
-                add = '-'
-                pattern = '[' + self._features[i] + ']'
-            letter = re.sub('%s' % pattern, '', letter)
-            #print(i, before, add, self._features[i], '=', letter )
+                letter = letter.difference(self._features[i][1])
+
+            #print(letter)
 
         if len(letter) > 1:
             pass
 
-        return(letter)
+        return(next(iter(letter)))  #How to get the item from a set
+
+        '''
+        for i in self._features.keys():
+            before = letter
+            if(self[i]):
+                add = '+'
+                pattern = '[^' + self._features[i][1] + ']'
+            else:
+                add = '-'
+                pattern = '[' + self._features[i][1] + ']'
+            letter = re.sub('%s' % pattern, '', letter)
+            #print(i, before, add, self._features[i][1], '=', letter )
+'''
+
 
     def set_place(self, place):
         for i in self._features.get_valid_places():
@@ -85,26 +102,3 @@ class Phone(dict):
                 to_return += '%s, ' % (i[0])
         to_return += self.letterize()
         return(to_return)
-
-if debug:
-    f = Features('ptkbdgaeioumnN') #Will be different by language
-    f['syllabic'] = 'aeiou'
-    f['consonant'] = 'ptkbdgmnN'
-    f['voiced'] = 'bdgmnN'
-    f['labial'] = 'pbm'
-    f['coronal'] = 'tdn'
-    f['dorsal'] = 'aeioukgN'
-    f['nasal'] = 'mnN'
-    f.set_valid_places(['labial', 'coronal', 'dorsal'])
-    p = Phone(f)
-    p.featurize('d')
-    print(p)
-    m = Phone(f)
-    m.featurize('m')
-    print(m)
-    m.assimilate(p,'place')
-    print(m)
-    m.assimilate('k','place')
-    print(m)
-    m.set_att('nasal', False)
-    print(m)
