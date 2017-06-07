@@ -22,7 +22,7 @@ if debug:
 
     #Labial block
     f.add('round','úóow')
-    f.add('labial',f['round'][1] | {'pbm'}) #w is both labial and dorsal
+    f.add('labial',f['round'][1] | {'Ppbmfv'}) #w is both labial and dorsal
 
 
     #Dorsal block

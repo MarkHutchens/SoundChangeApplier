@@ -83,6 +83,9 @@ class Phone(dict):
             #print(letter)
 
         if len(letter) > 1:
+            print("Conflict: two phones have same description")
+            print(letter)
+            self.print_features()
             pass
 
         return(next(iter(letter)))  #How to get the item from a set
@@ -127,6 +130,6 @@ class Phone(dict):
         return(to_return)
 
     def print_features(self):
-        print(self)
+        #print(self)
         for i in self._features:
             print('  ' + i + ':' + str(self[i]))
