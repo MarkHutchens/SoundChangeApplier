@@ -68,6 +68,7 @@ class Word():
         self.phones = phones    #list of phone types.
         self.syllables = self.syllabilize()
 
+
     def set_phones(self, syls):
         self.syllables = syls
         self.syllabilize()
@@ -106,6 +107,13 @@ class Word():
         to_return = ''
         for s in self.syllables[::-1]:
             to_return += str(s) + '.'
+
+        #Do any changes on syllable level here
+
+        to_return = to_return.replace('.','')
+        #
+        # for rep in self.s_replace:
+        #     to_return = to_return.replace(rep[0],rep[1])
         return(to_return)
 
 

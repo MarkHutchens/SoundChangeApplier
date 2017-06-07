@@ -12,30 +12,42 @@ class Lexicon(dict):
         super()
 
 if debug:
-    letters = 'ptkbdgaiumnN'
-    s = set(letters)
+    letters = 'íéaiuáúóomnNptkPTKbdgfshvzwly'
+    #s = set(letters)
 
-    f = Features('ptkbdgaiumnN') #Will be different by language
-    f.add('syllabic','aeiou') #syllable peaks
+    f = Features(letters) #Will be different by language
+    f.add('syllabic','íéaiuáúóo') #syllable peaks
     #f['sonorant'] = ''
-    f.add('consonantal','ptkbdgmnN') #
+    f.add('consonantal','mnNptkPTKbdgfshvz') #w/l/y are neither.
 
-    f.add('voiced','bdgmnN')
-    f.add('labial','pbm')
+    #Dorsal block
+    f.add('back','úóoiuáNkKghw')
+    f.add('front','íéay')
+    f.add('high','íiúNkKghw')
+    f.add('low','aáo')
+
+
+    f.add('voice','íéaiuáúóomnNbdgvzwly')
+    f.add('labial','pbmúóow') #w is both labial and dorsal
     f.add('coronal','tdn')
-    f.add('dorsal','aeioukgN')
+    f.add('dorsal',f['back'][1] | f['front'][1])
     f.add('nasal','mnN')
 
     #vowels
-    f.add('front','i')
-    f.add('back','ua')
-    f.add('low','a')
+    #f.add('front','i')
+    #f.add('back','ua')
+    #f.add('low','a')
 
 
-    f.set_valid_places(['labial', 'coronal', 'dorsal'])
+    f.set_valid_places(['labial', 'coronal', 'dorsal', 'pharyngeal', 'placeless'])
+
+    f.set_digraph("K","k'")
+    f.set_digraph("P","p'")
+    f.set_digraph("T","t'")
+    f.set_digraph("N","ng'")
 
 if debug:
-    w = 'badkubiku'
+    w = 'badkubéku'
     p_list = []
     for l in w:
         fone = Phone(f)

@@ -9,6 +9,8 @@ class Features(dict):
     def __init__(self, letters):
         self.letters = set(letters)
         self.__valid_places = None
+        self.s_replace = [] #For converting phones to digraphs
+
 
     def get_letters(self):
         return self.letters.copy()
@@ -21,6 +23,9 @@ class Features(dict):
 
     def set_valid_places(self, places: list):
         self.__valid_places = places
+
+    def set_digraph(self,s,replace):
+        self.s_replace.append([s,replace])
         
     def add(self,feature,lets):
         #add two sets at once. One that does contain, one that doesn't.
@@ -31,13 +36,22 @@ class Features(dict):
 class Phone(dict):
     def __init__(self, features: Features):
         self._features = features  #subclasses (for different langs) would have different relevant features
-        self._place = None
+        #self._place = None
+        #Consonant place and vowel place w has both, for instance. Neato.
+        self._vplace = None #Vowel place
+        self._cplace = None #[None,self._vplace] #default to none.
+
 
     def featurize(self, letter):
+        syl = 'syllabic' in self
         for i in self._features.keys():
             self[i] = letter in self._features[i][1] #Boolean t/f
             if i in self._features.get_valid_places() and self[i]:
-                self._place = i
+                self._cplace = [i,self._vplace]
+                if syl:
+                    if self['syllabic']:
+                        #If a vowel/semivowel, also get a vplace.
+                        self._vplace = i
 
 
     def letterize(self):
@@ -57,28 +71,17 @@ class Phone(dict):
 
         return(next(iter(letter)))  #How to get the item from a set
 
-        '''
-        for i in self._features.keys():
-            before = letter
-            if(self[i]):
-                add = '+'
-                pattern = '[^' + self._features[i][1] + ']'
-            else:
-                add = '-'
-                pattern = '[' + self._features[i][1] + ']'
-            letter = re.sub('%s' % pattern, '', letter)
-            #print(i, before, add, self._features[i][1], '=', letter )
-'''
 
-
-    def set_place(self, place):
+    def set_place(self, cplace, vplace = None):
         for i in self._features.get_valid_places():
             self[i] = False
-        self._place = place
-        self[self._place] = True
+        self._vplace = vplace
+        self._cplace = [cplace,self._vplace]
+        self[self._cplace] = True
+        if self._vplace: self[self._vplace] = True
 
     def get_place(self):
-        return self._place
+        return self._cplace
 
     def set_att(self, at, boo):
         self[at] = boo
@@ -89,7 +92,7 @@ class Phone(dict):
             new_phone.featurize(other)
             other = new_phone
             print(other.get_place())
-        if feature == 'place':
+        if feature == 'cplace':
             #Place is the only one that acts in a mutually exclusive way, so this is okay.
             self.set_place(other.get_place())
         else:
@@ -101,4 +104,7 @@ class Phone(dict):
             if i[1] and debug:
                 to_return += '%s, ' % (i[0])
         to_return += self.letterize()
+
+        for rep in self._features.s_replace:
+            to_return = to_return.replace(rep[0],rep[1])
         return(to_return)
