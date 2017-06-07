@@ -41,17 +41,33 @@ class Phone(dict):
         self._vplace = None #Vowel place
         self._cplace = None #[None,self._vplace] #default to none.
 
+        self._laryngeeal = {'voice': None,'aspiration': None,'glottalized': None} #[voice, aspiration, glottalization]
+
 
     def featurize(self, letter):
         syl = 'syllabic' in self
         for i in self._features.keys():
             self[i] = letter in self._features[i][1] #Boolean t/f
+
             if i in self._features.get_valid_places() and self[i]:
                 self._cplace = [i,self._vplace]
                 if syl:
                     if self['syllabic']:
                         #If a vowel/semivowel, also get a vplace.
                         self._vplace = i
+
+            if i in self._laryngeeal.keys():
+                self._laryngeeal[i] = self[i]
+
+
+    def update(self):
+        #Make sure nodes of place and laryng match true/false tags
+        for i in self._laryngeeal.keys():
+            self[i] = self._laryngeeal[i]
+        if i in self._features.get_valid_places():
+            self[i] = i in self._cplace
+
+
 
 
     def letterize(self):
@@ -78,7 +94,8 @@ class Phone(dict):
         self._vplace = vplace
         self._cplace = [cplace,self._vplace]
         self[self._cplace] = True
-        if self._vplace: self[self._vplace] = True
+        if self._vplace:
+            self[self._vplace] = True
 
     def get_place(self):
         return self._cplace
@@ -108,3 +125,8 @@ class Phone(dict):
         for rep in self._features.s_replace:
             to_return = to_return.replace(rep[0],rep[1])
         return(to_return)
+
+    def print_features(self):
+        print(self)
+        for i in self._features:
+            print('  ' + i + ':' + str(self[i]))
