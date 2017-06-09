@@ -130,6 +130,6 @@ class Phone(dict):
         return(to_return)
 
     def print_features(self):
-        #print(self)
+        print(self)
         for i in self._features:
             print('  ' + i + ':' + str(self[i]))

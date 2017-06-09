@@ -3,6 +3,7 @@ __author__ = 'mark'
 #A dictionary full of words. Includes a csv parser to generate same.
 import csv
 from SoundChangeApplier.word import *
+from SoundChangeApplier.parser import Parser
 
 debug = 1
 
@@ -12,6 +13,7 @@ class Lexicon(dict):
         super()
 
 if debug:
+    '''
     letters = 'íéaiuáúóomnNptkPTKbdgfshvzwly'
     #s = set(letters)
 
@@ -58,7 +60,9 @@ if debug:
     #f.add('back','ua')
     #f.add('low','a')
 
-
+    '''
+    p = Parser()
+    f = p.parse('phonelist.csv')
     f.set_valid_places(['labial', 'coronal', 'dorsal', 'pharyngeal', 'placeless'])
 
     f.set_digraph("K","k'")
@@ -67,14 +71,15 @@ if debug:
     f.set_digraph("N","ng'")
 
 if debug:
-    w = 'mínéNapitukáPúTóKobidigifisihiviziwiliy'
+    #w = 'mínéNapitukáPúTóKobidigifisihiviziwiliy'
+    w = 'lípído'
     #w = 'piti'
     p_list = []
     for l in w:
         fone = Phone(f)
         fone.featurize(l)
         p_list.append(fone)
-        #fone.print_features()
+        fone.print_features()
 
     badabi = Word('nonsense', p_list)
     print(badabi)
